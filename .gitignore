@@ -1,0 +1,23 @@
+# secrets and local config
+config.py
+
+# runtime data
+*.db
+*.db-journal
+output/
+cache/
+photo_*.bin
+photo_*.h
+latest.bin
+latest.h
+preview_*.png
+preview.png
+
+# python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# os noise
+.DS_Store
