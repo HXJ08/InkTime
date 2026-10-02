@@ -1,6 +1,6 @@
 """Example configuration for InkTime. Copy to config.py and edit.
 
-Copy with:  cp scripts/config.example.py scripts/config.py
+Copy with:  cp config.example.py config.py
 
 config.py is gitignored. Keep every secret in it (or in the environment, using
 the "env:VAR_NAME" indirection) and never in a tracked file.
@@ -38,6 +38,11 @@ USED_COOLDOWN_DAYS = 30
 # How many alternative frames to render per day. The frame picks one at random,
 # so this is also how unpredictable a day's photo is.
 DAILY_PHOTO_QUANTITY = 5
+
+# Optional album filter for the renderer. The `album` column is populated by
+# scripts/backfill_post.py, not by the analyzer. Leave empty to render from
+# every scored photo; set it (e.g. "Post") to restrict to one tagged album.
+ALBUM_FILTER = ""
 
 # ---------------------------------------------------------------- source
 

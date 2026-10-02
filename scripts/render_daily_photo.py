@@ -26,13 +26,15 @@ from typing import List, Dict, Any, Tuple, Optional
 import pillow_heif
 pillow_heif.register_heif_opener()
 from PIL import Image, ImageDraw, ImageFont, ImageOps
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import config as cfg
 
 
 TODAY = dt.date.today()
 
 # === Path config (from config.py) ===
-ROOT_DIR = Path(__file__).resolve().parent
+ROOT_DIR = Path(__file__).resolve().parent.parent  # repo root
 
 DB_PATH = Path(str(getattr(cfg, "DB_PATH", "photos.db") or "photos.db")).expanduser()
 if not DB_PATH.is_absolute():
@@ -56,6 +58,11 @@ MEMORY_THRESHOLD = float(getattr(cfg, "MEMORY_THRESHOLD", 70.0) or 70.0)
 # recently-used if no fresh candidates are available.
 USED_COOLDOWN_DAYS = int(getattr(cfg, "USED_COOLDOWN_DAYS", 30) or 30)
 DAILY_PHOTO_QUANTITY = int(getattr(cfg, "DAILY_PHOTO_QUANTITY", 5) or 5)
+
+# Optional album filter. The `album` column is written by the album backfill
+# (scripts/backfill_post.py), not by the analyzer. Empty string renders from
+# everything scored; set it (e.g. "Post") to restrict to one tagged album.
+ALBUM_FILTER = str(getattr(cfg, "ALBUM_FILTER", "") or "")
 
 # E-ink dimensions
 CANVAS_WIDTH = 480
@@ -119,8 +126,7 @@ def load_sim_rows() -> List[Dict[str, Any]]:
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
-    rows = c.execute(
-        """
+    sql = """
         SELECT photo_scores.path,
                photo_scores.exif_json,
                photo_scores.memory_score,
@@ -143,9 +149,13 @@ def load_sim_rows() -> List[Dict[str, Any]]:
         LEFT JOIN photo_blacklist ON photo_scores.immich_asset_id = photo_blacklist.immich_asset_id
         WHERE photo_scores.exif_json IS NOT NULL
           AND photo_blacklist.immich_asset_id IS NULL
-          AND photo_scores.album = 'Post'
-        """
-    ).fetchall()
+    """
+    params: list = []
+    if ALBUM_FILTER:
+        sql += " AND photo_scores.album = ?"
+        params.append(ALBUM_FILTER)
+
+    rows = c.execute(sql, params).fetchall()
     conn.close()
 
     items: List[Dict[str, Any]] = []

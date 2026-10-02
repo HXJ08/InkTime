@@ -27,9 +27,11 @@ Immich  ──►  analyze_photos.py  ──►  photos.db  ──►  render_da
 | `scripts/analyze_photos.py` | Pulls assets from Immich, scores them with a vision model, extracts EXIF, writes `photos.db` |
 | `scripts/immich_client.py` | Immich REST client (ping, asset info, thumbnails, cache sync) |
 | `scripts/render_daily_photo.py` | Selects today's photos, composites the info panel, dithers to 4 colours, writes `.bin` + previews |
+| `scripts/init_db.py` | Creates a fresh `photos.db` with the full schema |
 | `scripts/make_battery_icons.py` | Regenerates `battery_icons.h` (11 icons, 0-100%) |
 | `scripts/backfill_*.py` | One-off repair passes over an existing database |
 | `esp32/ink-display-7C-photo/` | Device firmware. Captive-portal Wi-Fi setup, download, battery overlay, deep sleep |
+| `config.example.py` | Template for the untracked `config.py`; copy it to the repo root and edit |
 | `docs/firmware.md` | Pinout, battery divider, `arduino-cli` build flags, calibration procedure |
 
 ## The frame
@@ -59,7 +61,7 @@ Requires Python 3.10+, `Pillow`, `pillow-heif`, `requests`, and `exiftool` on
 ```sh
 python -m venv venv && . venv/bin/activate
 pip install -r requirements.txt
-cp scripts/config.example.py scripts/config.py   # then edit it
+cp config.example.py config.py   # then edit it
 ```
 
 `config.py` is read by every script and is **not** tracked. `config.example.py`
@@ -81,6 +83,7 @@ documents every key; the ones you cannot skip:
 Then:
 
 ```sh
+python scripts/init_db.py                 # once: create the database schema
 python scripts/analyze_photos.py -j 1     # score + ingest. -j 1: SQLite deadlocks higher
 python scripts/render_daily_photo.py      # today's frames -> BIN_OUTPUT_DIR
 ```
@@ -103,9 +106,10 @@ Two notes for anyone adapting this:
 
 - `ensure_table()` creates `photo_scores` and `face_allowlist`, and adds columns
   individually for forward migration. `photo_blacklist` and the newer EXIF
-  columns are written by the pipeline but created by the migration/backfill
-  scripts, not by `ensure_table()`. Run the backfills once against a fresh
-  database or add the tables yourself.
+  columns (`exif_focal_35mm`, `exif_lens`, `exif_file_size`, `album`) were added
+  by the backfill scripts on the original deployment and are not created by
+  `ensure_table()` — so run `scripts/init_db.py` once against a fresh database
+  (it is idempotent) or the renderer's LEFT JOIN fails on first run.
 - `phash` is stored as an integer in a signed column. Perceptual hashes use the
   full 64-bit range and are compared with Hamming distance after masking; if you
   rewrite the dedupe path, keep the masking.

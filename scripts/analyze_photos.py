@@ -15,6 +15,8 @@ import io
 from PIL import Image, ExifTags, ImageOps
 import pillow_heif
 pillow_heif.register_heif_opener()
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import config as cfg
 import shutil
 
@@ -121,7 +123,7 @@ def _read_bytes_with_nas_retry(path: Path) -> bytes:
 
 # ================== Config section (from config.py) ==================
 
-ROOT_DIR = Path(__file__).resolve().parent
+ROOT_DIR = Path(__file__).resolve().parent.parent  # repo root
 
 # Image directory to scan
 IMAGE_DIR = Path(str(getattr(cfg, "IMAGE_DIR", "") or "")).expanduser()
