@@ -1346,7 +1346,12 @@ def _compute_phash(image_path: Path, hash_size: int = 8) -> int:
 def _hamming_distance(h1: int, h2: int) -> int:
     if h1 == h2:
         return 0
-    return bin(h1 ^ h2).count("1")
+    # Mask to 64 bits: hashes are stored sign-coerced (negative when the high
+    # bit is set), and Python's XOR on mixed sign values yields a negative
+    # result whose bin() representation undercounts. Masking both operands
+    # restores the true unsigned popcount.
+    mask = (1 << 64) - 1
+    return bin((h1 & mask) ^ (h2 & mask)).count("1")
 
 
 def _is_duplicate(new_phash: int, new_dt_str: str | None, conn) -> tuple[bool, str]:
