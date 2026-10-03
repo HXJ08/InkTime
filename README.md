@@ -20,6 +20,20 @@ Immich  ──►  analyze_photos.py  ──►  photos.db  ──►  render_da
                                                  HTTP host ──► ESP32-S3 frame
 ```
 
+## Gallery
+
+**PCB** — ESP32-S3-InkDisplay v1.0, 100×33 mm, 2-layer. Red = top copper, blue = bottom, purple = vias.
+
+![PCB layout](images/1-pcb-board.png)
+
+**Rendered frame** — 480×800, 4-colour e-ink. Photo on top, specs + battery icon + date/location below.
+
+![Rendered e-ink frame](images/2-rendered-frame.png)
+
+**Repo** — 17 files, 5 commits on `main`.
+
+![GitHub repo](images/3-github-repo.png)
+
 ## What is here
 
 | Path | Role |
