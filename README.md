@@ -47,6 +47,7 @@ Immich  ──►  analyze_photos.py  ──►  photos.db  ──►  render_da
 | `esp32/ink-display-7C-photo/` | Device firmware. Captive-portal Wi-Fi setup, download, battery overlay, deep sleep |
 | `config.example.py` | Template for the untracked `config.py`; copy it to the repo root and edit |
 | `docs/firmware.md` | Pinout, battery divider, `arduino-cli` build flags, calibration procedure |
+| `hardware/` | PCB source (`.epro2`) and `bom.csv` — see `hardware/README.md` |
 
 ## The frame
 
