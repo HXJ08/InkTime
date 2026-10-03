@@ -6,7 +6,7 @@ PCB source and bill of materials for the InkTime frame.
 |---|---|
 | `ESP32-S3-InkDisplay-v1.0.epro2` | EasyEDA Pro project (opens in EasyEDA Pro) |
 | `project2.json` | Project manifest, extracted from the `.epro2` |
-| `bom.csv` | Per-designator bill of materials, 26 line items |
+| `bom.csv` | Bill of materials, exported from EasyEDA — 17 line items, 24 components |
 
 ## Board
 
@@ -27,28 +27,33 @@ GDEM075F52 panel.
 
 **USB:** D+/D− routed as a declared differential pair (DP1/DP2).
 
-## BOM summary
+## BOM
 
-26 line items, 8 of which are fitted capacitors (C1-C7) and 4 are tactile
-switches. Consolidated:
+Sourced from EasyEDA's own export (`BOM_V1_PCB1_2026-10-03.xlsx`), so the LCSC
+supplier part numbers are included and the values are authoritative.
 
-| Qty | Part | Value | Designators |
-|---|---|---|---|
-| 4 | `RC1608F103CS` | 10 kΩ | R1, R4, R5, R6 |
-| 4 | `KH-6X6X5H-STM` | tactile switch | SW1-SW4 |
-| 3 | TO-56 socket, 2.54 mm 2P | | H2, H5, H6 |
-| 2 | `CL10A475KO8NNNC` | 4.7 µF | C1, C2 |
-| 2 | `CL10C470JB8NNNC` | 47 pF | C5, C6 |
-| 2 | `0603WAF220JT5E` | 22 Ω | R2, R3 |
-| 1 | `CL10B104KB8NNNC` | 100 nF | C3 |
-| 1 | `CL10A105KB8NNNC` | 1 µF | C4 |
-| 1 | `ESP32-S3-WROOM-1(N8R8)` | | U1 |
-| 1 | `MIC5219-3.3YM5` | | U2 |
-| 1 | `TP4056` | | U3 |
-| 1 | `PZ254V-11-04P` | 4P header | H1 |
-| 1 | `PZ254V-11-01P` | 1P header | H3 |
-| 1 | `HC-PZ254-11.5L-1X8PZ` | 8P header | H4 |
-| 1 | capacitor, 0603 | C7 | value not recorded in the project |
+| Designators | Qty | Value | Manufacturer Part | LCSC |
+|---|---|---|---|---|
+| C1 | 1 | 4.7 µF | `CL10A475KO8NNNC` | C19666 |
+| C2 | 1 | 10 µF | `CL10A106KP8NNNC` | C19702 |
+| C3 | 1 | 100 nF | `CL10B104KB8NNNC` | C1591 |
+| C4 | 1 | 1 µF | `CL10A105KB8NNNC` | C15849 |
+| C5, C6 | 2 | 47 pF | `CL10C470JB8NNNC` | C1671 |
+| C7 | 1 | 100 nF | — | — |
+| R1, R4 | 2 | 10 kΩ | `RC1608F103CS` | C17441167 |
+| R2, R3 | 2 | 22 Ω | `0603WAF220JT5E` | C23345 |
+| R5, R6 | 2 | 100 kΩ | — | — |
+| SW1-SW4 | 4 | — | `KH-6X6X5H-STM` | C2837531 |
+| H1 | 1 | — | `PZ254V-11-04P` | C2691448 |
+| H2 | 1 | — | `PZ254V-11-02P` | C492401 |
+| H3 | 1 | — | `PZ254V-11-01P` | C492400 |
+| H4 | 1 | — | `HC-PZ254-11.5L-1x8PZ` | C27985192 |
+| U1 | 1 | — | `ESP32-S3-WROOM-1-N8R8` | C2913201 |
+| U2 | 1 | — | `MIC5219-3.3YM5-TR` | C29613 |
+| U3 | 1 | — | `TP4056` | — |
+
+**24 components total.** C7, R5/R6 and U3 have values but no supplier part number
+recorded — they are generic and need picking at order time.
 
 ## Notes before ordering
 
@@ -57,9 +62,7 @@ switches. Consolidated:
 - **No DRC result is stored in the project file.** The design rules are present
   (0.127 mm min track, 0.15 mm gap, 0.30 mm board-edge clearance) but a clean pass is
   not asserted — re-run DRC in EasyEDA first.
-- **C7 has no recorded value or part number**, and **R5/R6** were generic `电阻`
-  symbols in the schematic. The BOM resolves R5/R6 to the same 10 kΩ 0603 family as
-  R1/R4 by reading the value attribute, and leaves C7 blank rather than guessing.
-- **The BOM is derived from the PCB file**, not from an exported design BOM — the
-  project ships no `.csv`. Values were decoded from the manufacturer part numbers
-  (e.g. `475` → 4.7 µF) and cross-checked against the board's function.
+- **`bom.csv` is EasyEDA's export, not a derivation.** An earlier version of this file
+  was reconstructed by parsing the PCB geometry and got three parts wrong: C2 as 4.7 µF
+  instead of 10 µF, C7 as blank instead of 100 nF, and R5/R6 as 10 kΩ instead of 100 kΩ.
+  The schematic knows values the PCB file does not, which is why the export supersedes it.
